@@ -35,7 +35,7 @@ Visualization & Deployment
 * [x] Segmentation mask analysis
 * [x] Tumor-region visualization
 * [x] Tumor volume calculation
-* [ ] Reusable patient loader
+* [x] Reusable patient loader
 * [ ] 2D U-Net baseline
 * [ ] 3D U-Net
 * [ ] Multimodal experiments
