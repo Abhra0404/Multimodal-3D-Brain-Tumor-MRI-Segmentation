@@ -1,0 +1,11 @@
+numpy
+matplotlib
+pandas
+nibabel
+scikit-image
+jupyter
+ipykernel
+monai
+torch
+torchvision
+torchaudio

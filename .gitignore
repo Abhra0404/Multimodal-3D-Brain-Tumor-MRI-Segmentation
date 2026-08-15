@@ -1,0 +1,87 @@
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ==============================
+# Virtual Environment
+# ==============================
+.venv/
+venv/
+env/
+ENV/
+
+# ==============================
+# Python tooling
+# ==============================
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ==============================
+# Jupyter
+# ==============================
+.ipynb_checkpoints/
+
+# ==============================
+# Environment / secrets
+# ==============================
+.env
+.env.*
+!.env.example
+
+# ==============================
+# BraTS Dataset
+# ==============================
+data/raw/
+data/processed/
+
+# Keep directory structure
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# ==============================
+# ML outputs
+# ==============================
+models/*.pt
+models/*.pth
+models/*.ckpt
+models/*.onnx
+
+results/*
+!results/.gitkeep
+
+# ==============================
+# Experiment outputs
+# ==============================
+experiments/
+runs/
+wandb/
+mlruns/
+
+# ==============================
+# Logs
+# ==============================
+*.log
+
+# ==============================
+# macOS
+# ==============================
+.DS_Store
+
+# ==============================
+# VS Code
+# ==============================
+.vscode/
+
+# ==============================
+# Temporary files
+# ==============================
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
