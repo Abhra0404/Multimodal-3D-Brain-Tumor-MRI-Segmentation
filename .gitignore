@@ -51,8 +51,6 @@ models/*.pth
 models/*.ckpt
 models/*.onnx
 
-results/*
-!results/.gitkeep
 
 # ==============================
 # Experiment outputs
