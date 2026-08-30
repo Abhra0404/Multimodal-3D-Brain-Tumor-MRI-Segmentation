@@ -1,375 +1,288 @@
 # Multimodal 3D Brain Tumor MRI Segmentation
 
-A deep learning pipeline for brain tumor segmentation from multimodal MRI scans using the **BraTS dataset**.
+A progressive deep-learning system for automated brain tumor segmentation from multimodal MRI volumes, developed through three model generations: **2D U-Net → 2.5D U-Net → 3D U-Net**.
 
-The project progressively explores 2D and 2.5D segmentation approaches while maintaining patient-level train/validation separation and quantitative evaluation.
+The project explores how increasing spatial context affects segmentation quality while building a complete medical-imaging pipeline covering preprocessing, sampling, model training, checkpointing, volumetric inference, evaluation, and error analysis.
 
 ---
 
 ## Overview
 
-Brain tumor segmentation is the task of identifying tumor regions from MRI scans.
+Brain tumor segmentation requires identifying tumor regions across 3D MRI volumes while handling large volumes, class imbalance, and substantial variation between patients.
 
-This project uses four MRI modalities:
+This project was developed incrementally rather than starting directly with a complex 3D architecture.
 
-- T1
-- T1ce
-- T2
-- FLAIR
+```text
+V2                 V3                    V4
+2D U-Net    →     2.5D U-Net      →     3D U-Net
+Single slice      Multi-slice           Volumetric
+context           context               context
+````
 
-The pipeline covers:
+Each version introduces additional spatial information and a more complete volumetric modeling strategy.
 
-- MRI preprocessing
-- Slice selection
-- Patient-level dataset splitting
-- Multimodal image construction
-- U-Net segmentation
-- 2.5D adjacent-slice context
-- Model training and checkpointing
-- Quantitative evaluation
-- Failure-mode analysis
-- Prediction visualization
+### Key capabilities
+
+* Multimodal MRI processing
+* Patient-level dataset organization
+* MRI normalization and preprocessing
+* Tumor-aware patch sampling
+* 2D, 2.5D, and 3D segmentation architectures
+* Patch-based 3D training
+* Overlapping patch reconstruction
+* CUDA / MPS support
+* Checkpoint-based training recovery
+* Patient-level evaluation
+* Quantitative and qualitative error analysis
+
+---
+
+## Model Evolution
+
+### V2 — 2D U-Net
+
+The first baseline uses conventional 2D U-Net segmentation.
+
+**Characteristics**
+
+* Single MRI slice as input
+* 2D convolutional encoder-decoder
+* Slice-based preprocessing
+* Patient-aware splitting
+* Baseline segmentation metrics
+
+V2 establishes a reference point for evaluating the impact of additional spatial context.
+
+---
+
+### V3 — 2.5D U-Net
+
+V3 introduces additional spatial context by providing multiple neighboring slices to the network.
+
+**Characteristics**
+
+* Multi-slice input
+* 2D convolutional processing
+* Adjacent-slice spatial context
+* Same general slice-level evaluation strategy as V2
+
+V3 improves tumor-slice Dice and recall compared with V2, demonstrating the value of incorporating information from neighboring slices.
+
+---
+
+### V4 — 3D U-Net
+
+V4 transitions from slice-based segmentation to full volumetric segmentation.
+
+**Characteristics**
+
+* 3D convolutional encoder-decoder
+* Four-channel multimodal MRI input
+* `64 × 128 × 128` 3D patches
+* `32 × 64 × 64` patch stride
+* Tumor-aware patch sampling
+* Overlapping patch reconstruction
+* Patient-level evaluation
+* GPU-accelerated training
+
+The V4 architecture uses a progressively expanding encoder followed by a symmetric decoder with skip connections.
+
+          4 MRI Modalities
+                 │
+                 ▼
+       ┌──────────────────┐
+       │ 3D Patch Extract │
+       │ 64 × 128 × 128   │
+       └────────┬─────────┘
+                │
+                ▼
+        ┌───────────────┐
+        │    Encoder    │
+        │ 32 → 64 → 128 │
+        └───────┬───────┘
+                │
+                ▼
+          ┌───────────┐
+          │ Bottleneck│
+          │    256    │
+          └─────┬─────┘
+                │
+                ▼
+        ┌───────────────┐
+        │    Decoder    │
+        │ 128 → 64 → 32 │
+        └───────┬───────┘
+                │
+                ▼
+          Tumor Mask
 
 ---
 
 ## Dataset
 
-The project uses the **BraTS 2023 Glioma Segmentation dataset**.
+The project uses the **BraTS 2023 Glioma Challenge training data**.
 
-Each patient contains four MRI modalities and a segmentation mask.
+Each patient contains multiple MRI modalities together with a tumor segmentation mask.
 
-```text
-T1
-T1ce
-T2
-FLAIR
-  ↓
-Segmentation Mask
-````
+The repository maintains separate metadata and preprocessing pipelines for the different model generations.
 
-Patient-level splitting is used to prevent slices from the same patient appearing in both training and validation sets.
+Raw medical imaging data is intentionally excluded from version control.
 
 ---
 
-## Project Versions
+# Results
 
-### V1 — Baseline Segmentation
+## V4 Final Evaluation
 
-Established the initial preprocessing and segmentation pipeline.
+V4 was evaluated on **126 held-out patients**.
 
-* Multimodal MRI input
-* 2D U-Net segmentation
-* Basic preprocessing
-* Dataset validation
-* Initial training and evaluation pipeline
+| Metric         |     Result |
+| -------------- | ---------: |
+| **Mean Dice**  | **0.8079** |
+| **Mean IoU**   | **0.7111** |
+| Dice Std. Dev. |     0.1902 |
+| IoU Std. Dev.  |     0.2117 |
+| Best Dice      | **0.9689** |
+| Worst Dice     |     0.0075 |
+
+The patient-level Dice distribution shows substantial variation between cases, motivating the dedicated V4 error-analysis experiments.
+
+### Best case
+
+```text
+Patient: BraTS-GLI-00768-000
+Dice:    0.9689
+IoU:     0.9396
+```
+
+### Worst case
+
+```text
+Patient: BraTS-GLI-00613-000
+Dice:    0.0075
+IoU:     0.0038
+```
+
+The worst case contained approximately **77k ground-truth tumor voxels**, while the model predicted only **437 voxels** at the default threshold. This indicates a genuine patient-level generalization failure rather than simply a small-tumor case.
+
+![alt text](./results/v4/image.png)
 
 ---
 
-### V2 — 2D U-Net
+## V2 vs V3
 
-V2 established the main 2D segmentation baseline.
+V2 and V3 were evaluated using the same slice-level validation framework.
 
-#### Input
+| Metric             |         V2 |         V3 |
+| ------------------ | ---------: | ---------: |
+| Overall Pixel Dice |     0.9294 |     0.9277 |
+| Mean Slice Dice    |     0.8240 | **0.8399** |
+| Tumor Slice Dice   |     0.8393 | **0.8508** |
+| IoU                | **0.8681** |     0.8652 |
+| Precision          | **0.9380** |     0.9177 |
+| Recall             |     0.9209 | **0.9380** |
+| Specificity        | **0.9992** |     0.9989 |
 
-```text
-4 × 128 × 128
-```
+V3 improves tumor-slice Dice and recall while slightly trading precision for increased tumor detection.
 
-The four channels correspond to:
+> **Note:** V4 uses a patient-level volumetric evaluation protocol, while V2/V3 use slice-level validation. Their Dice and IoU values should therefore not be interpreted as a direct leaderboard comparison.
 
-```text
-T1
-T1ce
-T2
-FLAIR
-```
-
-#### Model
-
-```text
-2D U-Net
-```
-
-#### Training
-
-```text
-Loss: BCE + Dice
-Optimizer: AdamW
-Learning Rate: 1e-4
-Epochs: 10
-Batch Size: 8
-Device: Apple MPS
-```
-
-#### Results
-
-| Metric               |         V2 |
-| -------------------- | ---------: |
-| Best Validation Dice | **0.8240** |
-| Validation IoU       | **0.7919** |
-| Overall Pixel Dice   | **0.9294** |
-| Tumor Slice Dice     | **0.8393** |
-| Precision            | **0.9380** |
-| Recall               | **0.9209** |
-| Specificity          | **0.9992** |
+![alt text](./results/v2/v2_qualitative_image.png)
 
 ---
 
-### V3 — 2.5D Adjacent-Slice U-Net
-
-V3 introduces neighboring-slice context while keeping the underlying U-Net architecture unchanged.
-
-Instead of using only slice `z`, three consecutive slices are combined:
+# Repository Structure
 
 ```text
-z-1
- z
-z+1
-```
-
-Each slice contains four MRI modalities:
-
-```text
-       z-1        z        z+1
-    ┌────────┐ ┌────────┐ ┌────────┐
-    │ T1     │ │ T1     │ │ T1     │
-    │ T1ce   │ │ T1ce   │ │ T1ce   │
-    │ T2     │ │ T2     │ │ T2     │
-    │ FLAIR  │ │ FLAIR  │ │ FLAIR  │
-    └────────┘ └────────┘ └────────┘
-
-             ↓
-
-        12-channel input
-          128 × 128
-```
-
-#### Input
-
-```text
-12 × 128 × 128
-```
-
-#### Model
-
-```text
-2D U-Net
-```
-
-The network architecture remains the same as V2; only the input representation changes from 4 to 12 channels.
-
-#### Training
-
-```text
-Loss: BCE + Dice
-Optimizer: AdamW
-Learning Rate: 1e-4
-Epochs: 10
-Batch Size: 8
-Device: Apple MPS
-```
-
-#### Results
-
-Best checkpoint:
-
-```text
-Epoch: 9
-```
-
-| Metric                   |         V3 |
-| ------------------------ | ---------: |
-| **Best Validation Dice** | **0.8399** |
-| Validation IoU           | **0.8079** |
-| Overall Pixel Dice       | **0.9277** |
-| Tumor Slice Dice         | **0.8508** |
-| Precision                | **0.9177** |
-| Recall                   | **0.9380** |
-| Specificity              | **0.9989** |
-
-### V2 → V3
-
-| Metric           |     V2 |         V3 |
-| ---------------- | -----: | ---------: |
-| Mean Slice Dice  | 0.8240 | **0.8399** |
-| Tumor Slice Dice | 0.8393 | **0.8508** |
-| IoU              | 0.7919 | **0.8079** |
-| Recall           | 0.9209 | **0.9380** |
-| Precision        | 0.9380 |     0.9177 |
-
-The V3 results show that adding adjacent-slice context improved slice-level segmentation and tumor recall.
-
----
-
-## V3 Failure Analysis
-
-The full validation set contains:
-
-```text
-Validation slices: 4000
-Tumor-containing slices: 1992
-Empty slices: 2008
-```
-
-### Tumor Size Performance
-
-| Tumor Size              | Slices |  Mean Dice |
-| ----------------------- | -----: | ---------: |
-| Small (<100 pixels)     |    409 |     0.5758 |
-| Medium (100–499 pixels) |    858 |     0.8998 |
-| Large (≥500 pixels)     |    725 | **0.9479** |
-
-Small tumors remain the most challenging cases.
-
-For V3:
-
-```text
-Small tumor slices: 409
-Dice < 0.25: 107
-Dice < 0.50: 138
-Dice ≥ 0.75: 201
-Dice = 0: 0
-```
-
-Qualitative analysis shows that the remaining failures are primarily associated with very small lesions where accurate localization is difficult.
-
----
-
-## Evaluation
-
-The evaluation pipeline measures:
-
-### Segmentation Metrics
-
-* Dice coefficient
-* IoU
-* Precision
-* Recall
-* Specificity
-
-### Slice-Level Analysis
-
-* Mean slice Dice
-* Tumor-containing slice Dice
-* Empty-slice performance
-* Small/medium/large tumor performance
-* Best and worst performing slices
-
-### Qualitative Analysis
-
-Prediction visualizations are used to inspect:
-
-* Correct segmentations
-* False positives
-* False negatives
-* Small tumor failures
-* Boundary errors
-
----
-
-## Project Structure
-
-```text
-BraTS/
-│
+.
 ├── data/
-│   ├── raw/
-│   ├── metadata/
-│   └── processed/
-│       ├── v2/
-│       └── v3/
+│   └── metadata/
 │
 ├── models/
 │   ├── v2/
-│   │   ├── best.pt
-│   │   └── latest.pt
-│   │
-│   └── v3/
-│       ├── best.pt
-│       └── latest.pt
+│   ├── v3/
+│   └── v4/
 │
 ├── notebooks/
-│   └── ...
+│   ├── 01_dataset_exploration.ipynb
+│   ├── 02_patient_loader.ipynb
+│   ├── 03_v2_preprocessing.ipynb
+│   ├── 04_v2_unet_training.ipynb
+│   ├── 05_v2_unet _evaluation.ipynb
+│   ├── 06_v3_preprocessing.ipynb
+│   ├── 07_v3_training.ipynb
+│   ├── 08_v3_evaluation.ipynb
+│   ├── 09_v4_3d_unet.ipynb
+│   ├── 10_v4_error_analysis.ipynb
+│   └── Model_Comparison_V2_V3_V4.ipynb
+│
+├── results/
+│   ├── v2/
+│   └── v4/
 │
 ├── src/
 │   ├── v2_2d_unet_model/
-│   │   ├── dataset.py
-│   │   ├── preprocess_v2.py
-│   │   ├── train_v2.py
-│   │   └── unet.py
-│   │
-│   └── v3_2.5d_unet_model/
-│       ├── dataset.py
-│       ├── preprocess_v3.py
-│       ├── train_v3.py
-│       └── unet_v3.py
+│   ├── v3_2.5d_unet_model/
+│   └── v4_3d_unet_model/
 │
-├── .gitignore
+├── main.py
+├── plan.md
+├── pyproject.toml
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Tech Stack
+# Reproducibility
 
-* Python
-* PyTorch
-* NumPy
-* NiBabel
-* Matplotlib
-* Jupyter
-* Apple Metal Performance Shaders (MPS)
+The project stores patient split metadata and uses fixed seeds where applicable.
+
+V4 maintains a dedicated patient split:
+
+```text
+data/metadata/v4_patient_split.json
+```
+
+This prevents patient leakage between training and evaluation sets.
+
+Model checkpoints are stored separately from the training code.
 
 ---
 
-## Reproducibility
+# Limitations
 
-The project uses:
+This project is an experimental research/portfolio implementation and **not a clinical diagnostic system**.
 
-* Patient-level train/validation splitting
-* Fixed preprocessing pipelines
-* Saved dataset metadata
-* Saved model checkpoints
-* Recorded training metrics
-* Separate versioned preprocessing and model implementations
+Current limitations include:
 
-Best-performing checkpoints are stored under:
+* Significant patient-to-patient performance variation
+* Difficult failure cases in V4
+* Different evaluation protocols across V2, V3, and V4
+* No clinical validation
+* No external-dataset evaluation
+* Limited systematic ablation studies
 
-```text
-models/v2/best.pt
-models/v3/best.pt
-```
+The V4 benchmark should therefore be interpreted as an engineering and research result rather than a clinically validated segmentation system.
 
 ---
 
-## Key Results
+# Future Work
 
-The progression demonstrates the effect of adding spatial context:
+Potential V5 directions are driven by the observed V4 failure modes rather than simply increasing model size.
 
-```text
-V2 — 2D single slice
-        ↓
-     Dice: 0.8240
+Planned areas include:
 
-        ↓
+* Improved probability calibration
+* More robust tumor-aware sampling
+* Stronger 3D data augmentation
+* Better handling of difficult patients
+* Systematic ablation experiments
+* Improved post-processing
+* External-dataset evaluation
+* More efficient volumetric inference
 
-V3 — 2.5D adjacent slices
-        ↓
-     Dice: 0.8399
-```
-
-The V3 experiment improved the validation Dice by:
-
-```text
-+0.0159
-```
-
-while also increasing tumor-slice recall from:
-
-```text
-0.9209 → 0.9380
-```
+The goal of V5 is to determine **why V4 fails on difficult patients and whether targeted improvements can improve robustness without sacrificing performance on successful cases.**
 
 ---
 
