@@ -198,6 +198,9 @@ V3 improves tumor-slice Dice and recall while slightly trading precision for inc
 ├── data/
 │   └── metadata/
 │
+├── demo/
+│   └── app.py
+│
 ├── models/
 │   ├── v2/
 │   ├── v3/
@@ -217,16 +220,17 @@ V3 improves tumor-slice Dice and recall while slightly trading precision for inc
 │   └── Model_Comparison_V2_V3_V4.ipynb
 │
 ├── results/
+│   ├── figures/ 
 │   ├── v2/
 │   └── v4/
 │
 ├── src/
+│   ├── predict.py
 │   ├── v2_2d_unet_model/
 │   ├── v3_2.5d_unet_model/
 │   └── v4_3d_unet_model/
 │
 ├── main.py
-├── plan.md
 ├── pyproject.toml
 ├── requirements.txt
 └── README.md
