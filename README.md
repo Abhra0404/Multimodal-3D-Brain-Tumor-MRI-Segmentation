@@ -8,7 +8,7 @@ The project explores how increasing spatial context affects segmentation quality
 
 ## Overview
 
-**[Live Showcase ↗](YOUR_DEPLOYED_LINK)**
+**[Live Showcase ↗](https://abhra0404.github.io/Multimodal-3D-Brain-Tumor-MRI-Segmentation/)**
 
 Brain tumor segmentation requires identifying tumor regions across 3D MRI volumes while handling large volumes, class imbalance, and substantial variation between patients.
 
