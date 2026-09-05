@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Multimodal 3D Brain Tumor MRI Segmentation — a progressive 2D, 2.5D and 3D U-Net deep-learning project by Abhra Jaiswal."
+  >
+
+  <title>
+    Multimodal 3D Brain Tumor MRI Segmentation — Abhra Jaiswal
+  </title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Scroll Progress -->
+  <div class="bar"></div>
+
+
+  <!-- =========================
+       NAVIGATION
+  ========================== -->
+
+  <header>
+
+    <a href="#" class="logo">
+      AJ<span>/</span>BTMS
+    </a>
+
+    <nav>
+      <a href="#approach">Approach</a>
+      <a href="#v4">V4</a>
+      <a href="#results">Results</a>
+      <a href="#analysis">Analysis</a>
+    </nav>
+
+    <a
+      class="github-link"
+      href="https://github.com/Abhra0404"
+      target="_blank"
+      rel="noreferrer"
+    >
+      <svg
+        class="github-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.084-.729.084-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.834 2.809 1.304 3.495.997.108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.435.375.81 1.096.81 2.21 0 1.595-.015 2.88-.015 3.27 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+      </svg>
+      <span aria-hidden="true">↗</span>
+    </a>
+
+  </header>
+
+
+  <main>
+
+
+    <!-- =========================
+         HERO
+    ========================== -->
+
+    <section class="hero">
+
+      <div class="hero-label">
+        MEDICAL IMAGING / DEEP LEARNING / 2026
+      </div>
+
+      <h1>
+        Multimodal 3D<br>
+        <span>Brain Tumor</span><br>
+        MRI Segmentation
+      </h1>
+
+      <p class="hero-intro">
+        A deep-learning system for automatically identifying and
+        segmenting tumor regions from multimodal 3D brain MRI.
+        The project evolves from 2D → 2.5D → 3D U-Net architectures
+        to study how increasing spatial context affects volumetric
+        segmentation.
+      </p>
+
+      <div class="actions">
+
+        <a
+          class="btn dark"
+          href="#results"
+        >
+          Explore results ↓
+        </a>
+
+        <a
+          class="btn"
+          href="https://github.com/Abhra0404"
+          target="_blank"
+          rel="noreferrer"
+        >
+          View source ↗
+        </a>
+
+      </div>
+
+      <div class="meta">
+
+        <div>
+          <b>DATASET</b>
+          BraTS 2023 GLI
+        </div>
+
+        <div>
+          <b>INPUT</b>
+          4 MRI modalities
+        </div>
+
+        <div>
+          <b>FINAL ARCHITECTURE</b>
+          3D U-Net
+        </div>
+
+        <div>
+          <b>EVALUATION</b>
+          126 patients
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         PROJECT INTRO
+    ========================== -->
+
+    <section
+      class="intro project-intro"
+      id="approach"
+    >
+
+      <div>
+        <small>01 / THE PROJECT</small>
+      </div>
+
+      <div class="intro-content">
+
+        <h2>
+          What is this<br>
+          project about?
+        </h2>
+
+        <div>
+
+          <p class="intro-lead">
+            Brain tumor segmentation is the task of locating tumor
+            tissue within an MRI volume and producing a voxel-level
+            segmentation mask.
+          </p>
+
+          <p>
+            This project explores the problem through progressively
+            richer spatial representations. It starts with a
+            conventional 2D U-Net, moves to a 2.5D model using
+            neighboring slices, and finally introduces a 3D U-Net
+            that processes volumetric MRI patches.
+          </p>
+
+          <p>
+            The final system combines four MRI modalities,
+            tumor-aware sampling, overlapping 3D patch reconstruction,
+            checkpointed training, and patient-level evaluation.
+          </p>
+
+          <p>
+            The goal is not simply to maximize a metric, but to
+            understand the engineering challenges involved in
+            building a practical volumetric segmentation pipeline.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         INPUT DATA
+    ========================== -->
+
+    <section class="modalities">
+
+      <small>02 / INPUT DATA</small>
+
+      <div class="section-heading">
+
+        <h2>
+          Four views of<br>
+          <i>the same brain.</i>
+        </h2>
+
+        <p>
+          V4 uses four complementary MRI modalities as a four-channel
+          input volume. Each modality provides different tissue
+          contrast that helps distinguish tumor regions from
+          surrounding anatomy.
+        </p>
+
+      </div>
+
+
+      <div class="modality-grid">
+
+        <article>
+
+          <span>T1</span>
+
+          <h3>
+            Structural anatomy
+          </h3>
+
+          <p>
+            Provides anatomical and structural information about
+            the brain.
+          </p>
+
+        </article>
+
+
+        <article>
+
+          <span>T1ce</span>
+
+          <h3>
+            Contrast enhancement
+          </h3>
+
+          <p>
+            Highlights regions with contrast enhancement associated
+            with tumor tissue.
+          </p>
+
+        </article>
+
+
+        <article>
+
+          <span>T2</span>
+
+          <h3>
+            Fluid-sensitive contrast
+          </h3>
+
+          <p>
+            Provides complementary tissue and fluid-sensitive
+            information.
+          </p>
+
+        </article>
+
+
+        <article>
+
+          <span>FLAIR</span>
+
+          <h3>
+            Abnormal tissue
+          </h3>
+
+          <p>
+            Provides strong contrast for edema and other abnormal
+            regions.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         MODEL EVOLUTION
+    ========================== -->
+
+    <section class="model-section">
+
+      <small>03 / MODEL EVOLUTION</small>
+
+      <div class="evolution">
+
+        <article>
+
+          <small>
+            V2 / BASELINE
+          </small>
+
+          <h3>
+            2D U-Net
+          </h3>
+
+          <p>
+            Single-slice segmentation using a conventional
+            encoder-decoder architecture.
+          </p>
+
+          <strong>
+            0.8240
+          </strong>
+
+          <label>
+            Mean Slice Dice
+          </label>
+
+        </article>
+
+
+        <span class="evolution-arrow">
+          →
+        </span>
+
+
+        <article>
+
+          <small>
+            V3 / CONTEXT
+          </small>
+
+          <h3>
+            2.5D U-Net
+          </h3>
+
+          <p>
+            Neighboring slices provide additional depth context
+            while retaining 2D convolutions.
+          </p>
+
+          <strong>
+            0.8399
+          </strong>
+
+          <label>
+            Mean Slice Dice
+          </label>
+
+        </article>
+
+
+        <span class="evolution-arrow">
+          →
+        </span>
+
+
+        <article class="dark">
+
+          <small>
+            V4 / VOLUMETRIC
+          </small>
+
+          <h3>
+            3D U-Net
+          </h3>
+
+          <p>
+            Four-channel volumetric segmentation with patch-based
+            training and inference.
+          </p>
+
+          <strong>
+            0.8079
+          </strong>
+
+          <label>
+            Mean patient Dice
+          </label>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         V4 SYSTEM
+    ========================== -->
+
+    <section
+      class="darksec"
+      id="v4"
+    >
+
+      <small>
+        04 / V4 SYSTEM
+      </small>
+
+
+      <div class="twocol">
+
+        <div>
+
+          <h2>
+            Volumetric<br>
+            by design.
+          </h2>
+
+          <p>
+            Full MRI volumes are too large to process naively on
+            constrained hardware. V4 combines 3D convolutions with
+            patch-based training and overlapping reconstruction.
+          </p>
+
+
+          <div class="spec">
+
+            <div>
+              INPUT
+              <b>
+                4 × 155 × 240 × 240
+              </b>
+            </div>
+
+            <div>
+              PATCH
+              <b>
+                64 × 128 × 128
+              </b>
+            </div>
+
+            <div>
+              STRIDE
+              <b>
+                32 × 64 × 64
+              </b>
+            </div>
+
+            <div>
+              CHANNELS
+              <b>
+                32 → 64 → 128 → 256
+              </b>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="arch">
+
+          <div>
+            4 MRI MODALITIES
+          </div>
+
+          <i></i>
+
+          <div>
+            PATCH EXTRACTION
+            <br>
+            <em>
+              64 × 128 × 128
+            </em>
+          </div>
+
+          <i></i>
+
+          <div class="row">
+
+            <div>
+              ENCODER
+              <br>
+              <em>
+                32 → 64 → 128
+              </em>
+            </div>
+
+            <div>
+              BOTTLENECK
+              <br>
+              <em>
+                256
+              </em>
+            </div>
+
+            <div>
+              DECODER
+              <br>
+              <em>
+                128 → 64 → 32
+              </em>
+            </div>
+
+          </div>
+
+          <i></i>
+
+          <div>
+            TUMOR MASK
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="pipeline">
+
+        <div>
+          <b>01</b>
+          Load
+          <small>
+            multimodal NIfTI
+          </small>
+        </div>
+
+        <div>
+          <b>02</b>
+          Normalize
+          <small>
+            per modality
+          </small>
+        </div>
+
+        <div>
+          <b>03</b>
+          Sample
+          <small>
+            tumor-aware patches
+          </small>
+        </div>
+
+        <div>
+          <b>04</b>
+          Predict
+          <small>
+            3D U-Net
+          </small>
+        </div>
+
+        <div>
+          <b>05</b>
+          Reconstruct
+          <small>
+            overlap averaging
+          </small>
+        </div>
+
+        <div>
+          <b>06</b>
+          Evaluate
+          <small>
+            patient-level Dice
+          </small>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         TRAINING STRATEGY
+    ========================== -->
+
+    <section class="training">
+
+      <small>
+        05 / TRAINING STRATEGY
+      </small>
+
+
+      <div class="section-heading">
+
+        <h2>
+          Train where<br>
+          <i>the signal is.</i>
+        </h2>
+
+        <p>
+          Instead of treating every region of a large MRI volume
+          equally, V4 uses tumor-aware sampling to increase exposure
+          to informative patches while keeping 3D computation
+          manageable.
+        </p>
+
+      </div>
+
+
+      <div class="training-flow">
+
+        <div>
+          <span>01</span>
+          <b>Tumor-aware sampling</b>
+          <small>
+            Prioritize informative regions
+          </small>
+        </div>
+
+        <div>
+          <span>02</span>
+          <b>3D patch extraction</b>
+          <small>
+            64 × 128 × 128 volumes
+          </small>
+        </div>
+
+        <div>
+          <span>03</span>
+          <b>Forward pass</b>
+          <small>
+            3D U-Net prediction
+          </small>
+        </div>
+
+        <div>
+          <span>04</span>
+          <b>Optimization</b>
+          <small>
+            Segmentation loss + backpropagation
+          </small>
+        </div>
+
+        <div>
+          <span>05</span>
+          <b>Checkpoint</b>
+          <small>
+            Recoverable training state
+          </small>
+        </div>
+
+      </div>
+
+
+      <div class="training-specs">
+
+        <div>
+          <span>BATCH SIZE</span>
+          <b>2</b>
+        </div>
+
+        <div>
+          <span>LEARNING RATE</span>
+          <b>1e-4</b>
+        </div>
+
+        <div>
+          <span>TUMOR RATIO</span>
+          <b>0.5</b>
+        </div>
+
+        <div>
+          <span>SEED</span>
+          <b>42</b>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         EVALUATION
+    ========================== -->
+
+    <section class="evaluation">
+
+      <small>
+        06 / EVALUATION
+      </small>
+
+
+      <div class="section-heading">
+
+        <h2>
+          Measure the<br>
+          <i>whole volume.</i>
+        </h2>
+
+        <p>
+          V4 is evaluated after reconstructing complete patient
+          volumes. This differs from the slice-level evaluation
+          used by V2 and V3.
+        </p>
+
+      </div>
+
+
+      <div class="evaluation-grid">
+
+        <article>
+
+          <span>
+            V2 / V3
+          </span>
+
+          <h3>
+            Slice-level
+          </h3>
+
+          <p>
+            Metrics are calculated across individual MRI slices.
+          </p>
+
+          <strong>
+            Slice Dice / IoU
+          </strong>
+
+        </article>
+
+
+        <article class="selected">
+
+          <span>
+            V4
+          </span>
+
+          <h3>
+            Patient-level
+          </h3>
+
+          <p>
+            Overlapping predictions are reconstructed into a
+            complete 3D tumor volume before evaluation.
+          </p>
+
+          <strong>
+            Volumetric Dice / IoU
+          </strong>
+
+        </article>
+
+      </div>
+
+
+      <div class="evaluation-note">
+
+        V2/V3 and V4 use different evaluation protocols.
+        Their headline Dice scores should therefore not be
+        interpreted as directly comparable benchmark results.
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         RESULTS
+    ========================== -->
+
+    <section id="results">
+
+      <small>
+        07 / RESULTS
+      </small>
+
+
+      <div class="resulthead">
+
+        <div>
+
+          <h2>
+            126 patients.<br>
+            <i>One uncomfortable benchmark.</i>
+          </h2>
+
+          <p>
+            V4 was evaluated on a held-out patient set using
+            volumetric reconstruction and patient-level metrics.
+          </p>
+
+        </div>
+
+
+        <div class="headline">
+
+          <strong>
+            0.8079
+          </strong>
+
+          <small>
+            MEAN DICE
+          </small>
+
+        </div>
+
+      </div>
+
+
+      <div class="metrics">
+
+        <div>
+          <strong>
+            0.7111
+          </strong>
+
+          <small>
+            Mean IoU
+          </small>
+        </div>
+
+        <div>
+          <strong>
+            0.1902
+          </strong>
+
+          <small>
+            Dice σ
+          </small>
+        </div>
+
+        <div>
+          <strong>
+            0.9689
+          </strong>
+
+          <small>
+            Best Dice
+          </small>
+        </div>
+
+        <div>
+          <strong>
+            0.0075
+          </strong>
+
+          <small>
+            Worst Dice
+          </small>
+        </div>
+
+      </div>
+
+
+      <div class="figs">
+
+        <figure class="wide">
+
+          <img
+            src="../results/figures/model_evolution.png"
+            alt="Model evolution from V2 to V4"
+          >
+
+          <figcaption>
+            Model evolution
+          </figcaption>
+
+        </figure>
+
+
+        <figure>
+
+          <img
+            src="../results/figures/v4_dice_distribution.png"
+            alt="V4 patient-level Dice distribution"
+          >
+
+          <figcaption>
+            Patient-level Dice distribution
+          </figcaption>
+
+        </figure>
+
+
+        <figure>
+
+          <img
+            src="../results/figures/v4_dice_vs_iou.png"
+            alt="V4 Dice versus IoU"
+          >
+
+          <figcaption>
+            Dice vs IoU
+          </figcaption>
+
+        </figure>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         BEST / WORST CASES
+    ========================== -->
+
+    <section class="cases">
+
+      <small>
+        08 / CASES
+      </small>
+
+
+      <div class="casegrid">
+
+        <article>
+
+          <small>
+            BEST CASE / BraTS-GLI-00768-000
+          </small>
+
+          <strong>
+            0.9689
+            <em>DICE</em>
+          </strong>
+
+          <img
+            src="../results/figures/v4_best_case.png"
+            alt="V4 best case"
+          >
+
+          <p>
+            Strong overlap between predicted and ground-truth
+            tumor regions.
+          </p>
+
+        </article>
+
+
+        <article>
+
+          <small>
+            WORST CASE / BraTS-GLI-00613-000
+          </small>
+
+          <strong>
+            0.0075
+            <em>DICE</em>
+          </strong>
+
+          <img
+            src="../results/figures/v4_worst_case.png"
+            alt="V4 worst case"
+          >
+
+          <p>
+            Approximately 77k ground-truth tumor voxels versus
+            only 437 predicted voxels at the default threshold —
+            a clear patient-level generalization failure.
+          </p>
+
+        </article>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         ERROR ANALYSIS
+    ========================== -->
+
+    <section
+      class="analysis"
+      id="analysis"
+    >
+
+      <small>
+        09 / ERROR ANALYSIS
+      </small>
+
+
+      <div class="twocol">
+
+        <h2>
+          The failure is<br>
+          <i>the result.</i>
+        </h2>
+
+
+        <div>
+
+          <p>
+            A mean score alone hides model behavior. The worst-case
+            investigation showed very low predicted probability
+            across the volume and almost no overlap with
+            tumor-containing slices.
+          </p>
+
+
+          <div class="finding">
+
+            <b>01</b>
+
+            <span>
+              <strong>
+                Patient variance
+              </strong>
+
+              Performance changes substantially between
+              held-out patients.
+            </span>
+
+          </div>
+
+
+          <div class="finding">
+
+            <b>02</b>
+
+            <span>
+              <strong>
+                Localization failure
+              </strong>
+
+              Some tumor-containing slices receive little or
+              no useful prediction.
+            </span>
+
+          </div>
+
+
+          <div class="finding">
+
+            <b>03</b>
+
+            <span>
+              <strong>
+                Threshold sensitivity
+              </strong>
+
+              The difficult case remained weak during diagnostic
+              threshold sweeps.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         COMPARISON
+    ========================== -->
+
+    <section class="compare">
+
+      <small>
+        10 / CONTEXT
+      </small>
+
+
+      <h2>
+        What changed across generations?
+      </h2>
+
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th></th>
+            <th>V2 / 2D</th>
+            <th>V3 / 2.5D</th>
+            <th>V4 / 3D</th>
+          </tr>
+
+        </thead>
+
+
+        <tbody>
+
+          <tr>
+            <td>Spatial context</td>
+            <td>Single slice</td>
+            <td>Neighboring slices</td>
+            <td>3D volume</td>
+          </tr>
+
+          <tr>
+            <td>Input</td>
+            <td>Slice</td>
+            <td>Multi-slice</td>
+            <td>4-channel MRI</td>
+          </tr>
+
+          <tr>
+            <td>Sampling</td>
+            <td>Slice</td>
+            <td>Slice</td>
+            <td>3D tumor-aware patches</td>
+          </tr>
+
+          <tr>
+            <td>Reconstruction</td>
+            <td>—</td>
+            <td>—</td>
+            <td>Overlapping patches</td>
+          </tr>
+
+          <tr>
+            <td>Evaluation</td>
+            <td>Slice-level</td>
+            <td>Slice-level</td>
+            <td>Patient-level</td>
+          </tr>
+
+        </tbody>
+
+      </table>
+
+
+      <p class="note">
+        V2/V3 and V4 use different evaluation protocols;
+        their headline Dice scores are not directly comparable.
+      </p>
+
+    </section>
+
+
+    <!-- =========================
+         FUTURE WORK
+    ========================== -->
+
+    <section class="future">
+
+      <small>
+        11 / FUTURE WORK
+      </small>
+
+
+      <div class="twocol">
+
+        <h2>
+          Understand the failure<br>
+          <i>before scaling.</i>
+        </h2>
+
+
+        <div>
+
+          <p>
+            Future work is driven by the observed V4 failure modes
+            rather than simply increasing model size.
+          </p>
+
+
+          <div class="future-list">
+
+            <div>
+              <span>01</span>
+              Improved probability calibration
+            </div>
+
+            <div>
+              <span>02</span>
+              More robust tumor-aware sampling
+            </div>
+
+            <div>
+              <span>03</span>
+              Stronger 3D augmentation
+            </div>
+
+            <div>
+              <span>04</span>
+              Systematic ablation experiments
+            </div>
+
+            <div>
+              <span>05</span>
+              Improved post-processing
+            </div>
+
+            <div>
+              <span>06</span>
+              External-dataset evaluation
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CLOSING
+    ========================== -->
+
+    <section class="closing">
+
+      <h2>
+        A segmentation model<br>
+        is only as useful as<br>
+        <i>the questions around it.</i>
+      </h2>
+
+
+      <p>
+        This project is an experimental research and portfolio
+        implementation focused on multimodal medical imaging,
+        volumetric deep learning, and understanding model behavior.
+      </p>
+
+
+      <a
+        class="btn light"
+        href="https://github.com/Abhra0404"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Open repository ↗
+      </a>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================
+       FOOTER
+  ========================== -->
+
+  <footer>
+
+    <span>
+      ABHRA JAISWAL
+    </span>
+
+    <span>
+      MULTIMODAL 3D BRAIN TUMOR MRI SEGMENTATION
+    </span>
+
+    <a
+      href="https://github.com/Abhra0404"
+      target="_blank"
+      rel="noreferrer"
+    >
+      GITHUB ↗
+    </a>
+
+  </footer>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>

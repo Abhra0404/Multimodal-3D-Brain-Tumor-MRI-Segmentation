@@ -9,4 +9,3 @@ monai
 torch
 torchvision
 torchaudio
-streamlit

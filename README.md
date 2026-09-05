@@ -8,6 +8,8 @@ The project explores how increasing spatial context affects segmentation quality
 
 ## Overview
 
+**[Live Showcase ↗](YOUR_DEPLOYED_LINK)**
+
 Brain tumor segmentation requires identifying tumor regions across 3D MRI volumes while handling large volumes, class imbalance, and substantial variation between patients.
 
 This project was developed incrementally rather than starting directly with a complex 3D architecture.
@@ -199,7 +201,8 @@ V3 improves tumor-slice Dice and recall while slightly trading precision for inc
 │   └── metadata/
 │
 ├── demo/
-│   └── app.py
+│   ├── index.html
+│   └── style.css
 │
 ├── models/
 │   ├── v2/
